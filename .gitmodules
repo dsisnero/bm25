@@ -1,0 +1,3 @@
+[submodule "vendor/bm25"]
+	path = vendor/bm25
+	url = https://github.com/Michael-JB/bm25.git

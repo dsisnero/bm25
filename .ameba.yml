@@ -1,0 +1,23 @@
+# Ameba configuration for bm25
+Version: "1.7.0-dev"
+
+Excluded:
+  - temp/**/*
+  - lib/**/*
+  - vendor/**/*
+  - spec/**/*
+
+Lint/NotNil:
+  Enabled: false
+
+Naming/BlockParameterName:
+  Enabled: false
+
+Style/RedundantNilInControlExpression:
+  Enabled: false
+
+Style/VerboseBlock:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false

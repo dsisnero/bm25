@@ -1,0 +1,12 @@
+# rumdl configuration for bm25
+
+[global]
+exclude = [
+    ".git",
+    "lib",
+    "temp",
+    "vendor",
+    "spec",
+    "CHANGELOG.md",
+]
+respect-gitignore = true
