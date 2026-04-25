@@ -12,7 +12,7 @@ lint:
 	ameba src spec
 
 test:
-	crystal spec
+	crystal spec spec/
 
 check: format lint test
 	@echo "All checks passed."

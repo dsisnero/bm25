@@ -146,6 +146,51 @@ describe Bm25 do
     end
   end
 
+  describe Bm25::Embedding do
+    it "creates via any factory" do
+      emb = Bm25::Embedding(UInt32).any
+      emb.size.should eq(1)
+      emb[0].index.should eq(1_u32)
+      emb[0].value.should eq(1.0_f32)
+    end
+  end
+
+  describe Bm25::EmbedderBuilder do
+    it "fits avgdl to corpus" do
+      tokenizer = WhitespaceTokenizer.new
+      corpus = ["hello world", "foo bar baz"]
+      builder = Bm25::EmbedderBuilder(UInt32, WhitespaceTokenizer).with_tokenizer_and_fit_to_corpus(tokenizer, corpus, Bm25::U32Embedder.new)
+      embedder = builder.build
+      embedder.avgdl.should eq(2.5_f32)
+    end
+
+    it "fits avgdl to empty corpus" do
+      builder = Bm25::EmbedderBuilder(UInt32, WhitespaceTokenizer).with_tokenizer_and_fit_to_corpus(WhitespaceTokenizer.new, [] of String, Bm25::U32Embedder.new)
+      embedder = builder.build
+      embedder.avgdl.should eq(256.0_f32)
+    end
+  end
+
+  describe Bm25::SearchEngineBuilder do
+    it "builds with documents" do
+      docs = [
+        Bm25::Document(String).new("a", "hello world"),
+        Bm25::Document(String).new("b", "goodbye world"),
+      ]
+      builder = Bm25::SearchEngineBuilder(String, String, WhitespaceTokenizer).with_tokenizer_and_documents(WhitespaceTokenizer.new, docs, CustomEmbedder.new)
+      engine = builder.build
+      engine.get("a").should_not be_nil
+      engine.get("b").should_not be_nil
+    end
+
+    it "builds with corpus" do
+      corpus = ["hello world", "foo bar baz"]
+      builder = Bm25::SearchEngineBuilder(String, String, WhitespaceTokenizer).with_tokenizer_and_corpus(WhitespaceTokenizer.new, corpus, CustomEmbedder.new)
+      engine = builder.build
+      engine.avgdl.should eq(2.5_f32)
+    end
+  end
+
   describe Bm25::SearchEngine do
     it "searches and returns relevant documents" do
       tokenizer = WhitespaceTokenizer.new

@@ -66,6 +66,18 @@ module Bm25
       end
       results
     end
+
+    def avgdl : Float32
+      @embedder.avgdl
+    end
+
+    def k1 : Float32
+      @embedder.k1
+    end
+
+    def b : Float32
+      @embedder.b
+    end
   end
 
   class SearchEngineBuilder(K, D, T)
@@ -77,38 +89,55 @@ module Bm25
       new(embedder_builder: eb)
     end
 
+    def self.with_tokenizer_and_documents(tokenizer : T, documents : Array(Document(K)), token_embedder : TokenEmbedder(D)) : self
+      contents = documents.map(&.contents)
+      eb = EmbedderBuilder(D, T).with_tokenizer_and_fit_to_corpus(tokenizer, contents, token_embedder)
+      new(embedder_builder: eb, documents: documents)
+    end
+
+    def self.with_tokenizer_and_corpus(tokenizer : T, corpus : Array(String), token_embedder : TokenEmbedder(D)) : self
+      eb = EmbedderBuilder(D, T).with_tokenizer_and_fit_to_corpus(tokenizer, corpus, token_embedder)
+      new(embedder_builder: eb)
+    end
+
+    def self.with_documents(language_mode : LanguageMode, documents : Array(Document(K)), token_embedder : TokenEmbedder(D)) : self
+      contents = documents.map(&.contents)
+      eb = EmbedderBuilder(D, T).with_fit_to_corpus(language_mode, contents, token_embedder)
+      new(embedder_builder: eb, documents: documents)
+    end
+
+    def self.with_corpus(language_mode : LanguageMode, corpus : Array(String), token_embedder : TokenEmbedder(D)) : self
+      eb = EmbedderBuilder(D, T).with_fit_to_corpus(language_mode, corpus, token_embedder)
+      new(embedder_builder: eb)
+    end
+
     def k1(v : Float32) : self
-      if eb = @embedder_builder
-        eb.k1(v)
-      end
+      @embedder_builder.try(&.k1(v))
       self
     end
 
     def b(v : Float32) : self
-      if eb = @embedder_builder
-        eb.b(v)
-      end
+      @embedder_builder.try(&.b(v))
       self
     end
 
     def avgdl(v : Float32) : self
-      if eb = @embedder_builder
-        eb.avgdl(v)
-      end
+      @embedder_builder.try(&.avgdl(v))
       self
     end
 
     def tokenizer(v : T) : self
-      if eb = @embedder_builder
-        eb.tokenizer(v)
-      end
+      @embedder_builder.try(&.tokenizer(v))
       self
     end
 
     def token_embedder(v : TokenEmbedder(D)) : self
-      if eb = @embedder_builder
-        eb.token_embedder(v)
-      end
+      @embedder_builder.try(&.token_embedder(v))
+      self
+    end
+
+    def language_mode(mode : LanguageMode) : self
+      @embedder_builder.try(&.language_mode(mode))
       self
     end
 

@@ -58,21 +58,25 @@ module Bm25
     end
 
     private def idf(token_index : D) : Float32
-      token_frequency = @inverted_token_index.fetch(token_index, Set(K).new).size.to_f32
-      numerator = @embeddings.size.to_f32 - token_frequency + 0.5
-      denominator = token_frequency + 0.5
-      Math.log(1.0 + numerator / denominator).to_f32
+      token_frequency = (@inverted_token_index[token_index]?.try(&.size) || 0).to_f32
+      n_docs = @embeddings.size.to_f32
+      numerator = n_docs - token_frequency + 0.5_f32
+      denominator = token_frequency + 0.5_f32
+      Math.log(1.0_f32 + numerator / denominator).to_f32
+    end
+
+    private def doc_value(document_embedding : Embedding(D), token_index : D) : Float32
+      document_embedding.tokens.each do |tok_emb|
+        return tok_emb.value if tok_emb.index == token_index
+      end
+      0.0_f32
     end
 
     private def score_(document_embedding : Embedding(D), query_embedding : Embedding(D)) : Float32
       document_score = 0.0_f32
-
       query_embedding.each_index do |token_index|
-        token_idf = idf(token_index)
-        token_value = document_embedding.tokens.find { |tok_emb| tok_emb.index == token_index }.try(&.value) || 0.0_f32
-        document_score += token_idf * token_value
+        document_score += idf(token_index) * doc_value(document_embedding, token_index)
       end
-
       document_score
     end
   end

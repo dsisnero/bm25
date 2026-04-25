@@ -45,8 +45,8 @@ module Bm25
       @tokens.each { |tok| yield tok.index }
     end
 
-    def method_missing(called : String, *args, **options)
-      @tokens.send(called, *args, **options)
+    def self.any : Embedding(D)
+      new([TokenEmbedding(D).new(1_u32.as(D), 1.0_f32)])
     end
   end
 
@@ -155,27 +155,39 @@ module Bm25
     FALLBACK_AVGDL = 256.0_f32
 
     getter avgdl : Float32
+    getter k1 : Float32
+    getter b : Float32
 
     def initialize(@tokenizer : T, @token_embedder : TokenEmbedder(D), @k1 : Float32 = 1.2, @b : Float32 = 0.75, @avgdl : Float32 = FALLBACK_AVGDL)
     end
 
     def embed(text : String) : Embedding(D)
-      tokens = @tokenizer.tokenize(text)
+      token_strings = @tokenizer.tokenize(text)
+      return Embedding(D).new([] of TokenEmbedding(D)) if token_strings.empty?
       avgdl = @avgdl <= 0 ? FALLBACK_AVGDL : @avgdl
 
-      indices = tokens.map { |tok| @token_embedder.embed(tok) }
+      indices = Array(D).new(token_strings.size)
+      token_strings.each do |ts|
+        indices << @token_embedder.embed(ts)
+      end
+
       counts = Hash(D, Int32).new(0)
       indices.each { |idx| counts[idx] += 1 }
 
-      values = indices.map do |idx|
-        token_frequency = counts[idx].to_f32
-        numerator = token_frequency * (@k1 + 1.0)
-        denominator = token_frequency + @k1 * (1.0 - @b + @b * (tokens.size.to_f32 / avgdl))
-        numerator / denominator
+      doc_len_f = token_strings.size.to_f32
+      k1 = @k1
+      b = @b
+      const_term = k1 * (1.0 - b + b * (doc_len_f / avgdl))
+
+      result_tokens = Array(TokenEmbedding(D)).new(indices.size)
+      indices.each do |idx|
+        tf = counts[idx].to_f32
+        numerator = tf * (k1 + 1.0)
+        denominator = tf + const_term
+        result_tokens << TokenEmbedding(D).new(idx, numerator / denominator)
       end
 
-      token_embeddings = indices.zip(values).map { |idx, val| TokenEmbedding(D).new(idx, val) }
-      Embedding(D).new(token_embeddings)
+      Embedding(D).new(result_tokens)
     end
   end
 
@@ -189,6 +201,26 @@ module Bm25
 
     def self.with_defaults(token_embedder : TokenEmbedder(D)) : self
       new(token_embedder)
+    end
+
+    def self.with_tokenizer_and_fit_to_corpus(tokenizer : T, corpus : Array(String), token_embedder : TokenEmbedder(D)) : self
+      avgdl = if corpus.empty?
+                256.0_f32
+              else
+                total_len = corpus.sum { |doc| tokenizer.tokenize(doc).size.to_u64 }
+                (total_len.to_f64 / corpus.size.to_f64).to_f32
+              end
+      new(token_embedder, avgdl: avgdl, tokenizer: tokenizer)
+    end
+
+    def self.with_fit_to_corpus(language_mode : LanguageMode, corpus : Array(String), token_embedder : TokenEmbedder(D)) : self
+      tokenizer = DefaultTokenizer.new(language_mode)
+      with_tokenizer_and_fit_to_corpus(tokenizer, corpus, token_embedder)
+    end
+
+    def language_mode(language_mode : LanguageMode) : self
+      @tokenizer = DefaultTokenizer.new(language_mode).as(T)
+      self
     end
 
     def k1(k1 : Float32) : self

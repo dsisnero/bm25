@@ -3,17 +3,25 @@
 ## Crystal Conventions
 
 - Follow `crystal tool format` output — no manual formatting exceptions.
-- Use abstract classes (not modules) for polymorphism with shared state.
+- `Tokenizer` is an abstract class (not module) — `DefaultTokenizer < Tokenizer`.
 - Builder pattern returns `self` (mutating, not consuming).
-- No external shard dependencies for core logic — implement inline.
+- `TokenEmbedder(D)` is a module included in structs — no implicit defaults.
 
-## Type Generics
+## Type Parameters
 
-- `D` = document/embedding index type (e.g. `UInt32`, `String`)
+- `D` = embedding index type (e.g. `UInt32`, `String`)
 - `T` = tokenizer type (e.g. `DefaultTokenizer`, `WhitespaceTokenizer`)
-- `TokenEmbedder(D)` must be explicitly provided — no unsafe defaults.
+- `TokenEmbedder(D)` must be explicitly provided to all constructors/builders.
 
 ## Naming
 
-- Upstream Rust names are preserved (Crystal casing: `snake_case` methods, `PascalCase` types).
-- Spec file mirrors source: `src/bm25/foo.cr` → `spec/foo_spec.cr`.
+- Types: `PascalCase` — `SearchEngine`, `DefaultTokenizer`, `EmbedderBuilder`
+- Methods: `snake_case` — `tokenize`, `upsert`, `with_avgdl`
+- Spec files: `spec/<name>_spec.cr` mirrors `src/bm25/<name>.cr`
+
+## Shards
+
+- `crystal-stemmer` — Porter2 stemming (vendored algorithm)
+- `deunicode` — Unicode-to-ASCII normalization
+- `stopwords` — Stopword lists (NLTK-backed)
+- No other shard dependencies for core logic.

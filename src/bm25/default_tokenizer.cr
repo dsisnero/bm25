@@ -23,6 +23,10 @@ module Bm25
     Fixed
   end
 
+  def self.fixed(language : Language = Language::English) : LanguageMode
+    LanguageMode::Fixed
+  end
+
   STOP_WORDS_ENGLISH = Set{
     "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any",
     "are", "aren't", "as", "at", "be", "because", "been", "before", "being", "below",
@@ -71,15 +75,27 @@ module Bm25
     end
 
     private def self.find_r1(w : String) : Int32
-      return 1 if w =~ /^[aeiouy]/
-      idx = w.index(/[aeiouy][^aeiouy]/)
-      idx ? idx + 2 : w.size
+      return 1 if w.size > 0 && VOWELS.includes?(w[0])
+      i = 0
+      while i < w.size - 1
+        if VOWELS.includes?(w[i]) && !VOWELS.includes?(w[i + 1])
+          return i + 2
+        end
+        i += 1
+      end
+      w.size
     end
 
     private def self.find_r2(w : String, r1 : Int32) : Int32
       return w.size if r1 >= w.size
-      idx = w.index(/[aeiouy][^aeiouy]/, r1)
-      idx ? idx + 2 : w.size
+      i = r1
+      while i < w.size - 1
+        if VOWELS.includes?(w[i]) && !VOWELS.includes?(w[i + 1])
+          return i + 2
+        end
+        i += 1
+      end
+      w.size
     end
 
     private def self.ends_with?(w : String, suffix : String) : Bool
@@ -95,7 +111,7 @@ module Bm25
     end
 
     private def self.has_vowel_in_stem?(w : String) : Bool
-      w.rindex(/[aeiouy]/) != nil
+      w.each_char.any? { |c| VOWELS.includes?(c) }
     end
 
     private def self.ends_double?(w : String) : Bool
@@ -332,16 +348,31 @@ module Bm25
   def self.split_unicode_words(text : String) : Array(String)
     tokens = [] of String
     current = String::Builder.new
-    i = 0
-    chars = text.chars
-    while i < chars.size
-      ch = chars[i]
+    last_was_dot = false
+    last_char = '\0'
+
+    text.each_char_with_index do |ch, _i|
+      if last_was_dot
+        last_was_dot = false
+        if current.bytesize > 0 && ch.number?
+          current << '.'
+          current << ch
+          last_char = ch
+          next
+        else
+          current << '.'
+        end
+      end
+
       if ch.alphanumeric? || ch == '\'' || ch == '_'
         current << ch
       elsif ch == '-' && current.bytesize > 0
         current << ch
-      elsif ch == '.' && current.bytesize > 0 && i + 1 < chars.size && chars[i + 1].number?
-        current << ch
+      elsif ch == '.'
+        if current.bytesize > 0
+          last_was_dot = true
+        end
+        next
       else
         if current.bytesize > 0
           token = current.to_s
@@ -349,12 +380,18 @@ module Bm25
           current = String::Builder.new
         end
       end
-      i += 1
+      last_char = ch
     end
+
+    if last_was_dot && current.bytesize > 0
+      current << '.'
+    end
+
     if current.bytesize > 0
       token = current.to_s
       tokens << token unless token.empty?
     end
+
     tokens.reject! { |t| t.each_char.all? { |c| c == '-' || c == '\'' || c == '_' } }
     tokens
   end
@@ -364,7 +401,7 @@ module Bm25
     end
 
     def self.new(language_mode : LanguageMode) : DefaultTokenizer
-      new
+      DefaultTokenizerBuilder.new.build
     end
 
     def self.builder : DefaultTokenizerBuilder

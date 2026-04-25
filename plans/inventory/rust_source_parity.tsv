@@ -1,82 +1,33 @@
 # source_api_id	status	crystal_refs	notes
-benches/search.rs::func::read_recipes	missing	-	baseline
-benches/search.rs::struct::BenchmarkRecipe	missing	-	baseline
-benches/search.rs::struct::Recipe	missing	-	baseline
-src/default_tokenizer.rs::enum::Language	missing	-	baseline
-src/default_tokenizer.rs::enum::LanguageMode	missing	-	baseline
-src/default_tokenizer.rs::func::build	missing	-	baseline
-src/default_tokenizer.rs::func::builder	missing	-	baseline
-src/default_tokenizer.rs::func::language_mode	missing	-	baseline
-src/default_tokenizer.rs::func::new	missing	-	baseline
-src/default_tokenizer.rs::func::normalization	missing	-	baseline
-src/default_tokenizer.rs::func::stemming	missing	-	baseline
-src/default_tokenizer.rs::func::stopwords	missing	-	baseline
-src/default_tokenizer.rs::method::DefaultTokenizer.new	missing	-	baseline
-src/default_tokenizer.rs::method::DefaultTokenizerBuilder.new	missing	-	baseline
-src/default_tokenizer.rs::struct::DefaultTokenizer	missing	-	baseline
-src/default_tokenizer.rs::struct::DefaultTokenizerBuilder	missing	-	baseline
-src/embedder.rs::func::any	missing	-	baseline
-src/embedder.rs::func::avgdl	missing	-	baseline
-src/embedder.rs::func::b	missing	-	baseline
-src/embedder.rs::func::build	missing	-	baseline
-src/embedder.rs::func::embed	missing	-	baseline
-src/embedder.rs::func::indices	missing	-	baseline
-src/embedder.rs::func::k1	missing	-	baseline
-src/embedder.rs::func::language_mode	missing	-	baseline
-src/embedder.rs::func::new	missing	-	baseline
-src/embedder.rs::func::tokenizer	missing	-	baseline
-src/embedder.rs::func::values	missing	-	baseline
-src/embedder.rs::func::with_avgdl	missing	-	baseline
-src/embedder.rs::func::with_fit_to_corpus	missing	-	baseline
-src/embedder.rs::func::with_tokenizer_and_fit_to_corpus	missing	-	baseline
-src/embedder.rs::method::Embedder.avgdl	missing	-	baseline
-src/embedder.rs::method::EmbedderBuilder.with_avgdl	missing	-	baseline
-src/embedder.rs::method::EmbedderBuilder.with_fit_to_corpus	missing	-	baseline
-src/embedder.rs::method::Embedding.any	missing	-	baseline
-src/embedder.rs::method::Embedding.indices	missing	-	baseline
-src/embedder.rs::method::TokenEmbedding.new	missing	-	baseline
-src/embedder.rs::struct::Embedder	missing	-	baseline
-src/embedder.rs::struct::EmbedderBuilder	missing	-	baseline
-src/embedder.rs::struct::Embedding	missing	-	baseline
-src/embedder.rs::struct::NoDefaultTokenizer	missing	-	baseline
-src/embedder.rs::struct::TokenEmbedding	missing	-	baseline
-src/embedder.rs::trait::TokenEmbedder	missing	-	baseline
-src/embedder.rs::type::DefaultEmbeddingSpace	missing	-	baseline
-src/embedder.rs::type::DefaultTokenEmbedder	missing	-	baseline
-src/embedder.rs::type::DefaultTokenizer	missing	-	baseline
-src/scorer.rs::func::matches	missing	-	baseline
-src/scorer.rs::func::new	missing	-	baseline
-src/scorer.rs::func::remove	missing	-	baseline
-src/scorer.rs::func::score	missing	-	baseline
-src/scorer.rs::func::upsert	missing	-	baseline
-src/scorer.rs::method::Scorer.new	missing	-	baseline
-src/scorer.rs::struct::ScoredDocument	missing	-	baseline
-src/scorer.rs::struct::Scorer	missing	-	baseline
-src/search.rs::func::avgdl	missing	-	baseline
-src/search.rs::func::b	missing	-	baseline
-src/search.rs::func::build	missing	-	baseline
-src/search.rs::func::get	missing	-	baseline
-src/search.rs::func::iter	missing	-	baseline
-src/search.rs::func::k1	missing	-	baseline
-src/search.rs::func::language_mode	missing	-	baseline
-src/search.rs::func::new	missing	-	baseline
-src/search.rs::func::remove	missing	-	baseline
-src/search.rs::func::search	missing	-	baseline
-src/search.rs::func::tokenizer	missing	-	baseline
-src/search.rs::func::upsert	missing	-	baseline
-src/search.rs::func::with_avgdl	missing	-	baseline
-src/search.rs::func::with_corpus	missing	-	baseline
-src/search.rs::func::with_documents	missing	-	baseline
-src/search.rs::func::with_tokenizer_and_corpus	missing	-	baseline
-src/search.rs::func::with_tokenizer_and_documents	missing	-	baseline
-src/search.rs::method::Document.new	missing	-	baseline
-src/search.rs::method::SearchEngine.upsert	missing	-	baseline
-src/search.rs::method::SearchEngineBuilder.with_avgdl	missing	-	baseline
-src/search.rs::method::SearchEngineBuilder.with_documents	missing	-	baseline
-src/search.rs::struct::Document	missing	-	baseline
-src/search.rs::struct::SearchEngine	missing	-	baseline
-src/search.rs::struct::SearchEngineBuilder	missing	-	baseline
-src/search.rs::struct::SearchResult	missing	-	baseline
-src/test_data_loader.rs::func::read_recipes	missing	-	baseline
-src/test_data_loader.rs::struct::Recipe	missing	-	baseline
-src/tokenizer.rs::trait::Tokenizer	missing	-	baseline
+src/tokenizer.rs::trait::Tokenizer	ported	src/bm25/tokenizer.cr	Abstract class with tokenize method
+src/embedder.rs::struct::TokenEmbedding	ported	src/bm25/embedder.cr::TokenEmbedding(D)	Struct with index + value
+src/embedder.rs::struct::Embedding	ported	src/bm25/embedder.cr::Embedding(D)	Struct wrapping Array(TokenEmbedding(D))
+src/embedder.rs::trait::TokenEmbedder	ported	src/bm25/embedder.cr::TokenEmbedder(D)	Module with abstract embed method
+src/embedder.rs::type::DefaultTokenEmbedder	ported	src/bm25/embedder.cr::U32Embedder	UInt32 embedder with fxhash
+src/embedder.rs::type::DefaultEmbeddingSpace	ported	-	UInt32, implicit
+src/embedder.rs::struct::Embedder	ported	src/bm25/embedder.cr::Embedder(D,T)	Class with embed, k1, b, avgdl
+src/embedder.rs::struct::EmbedderBuilder	ported	src/bm25/embedder.cr::EmbedderBuilder(D,T)	Builder with all options
+src/embedder.rs::method::Embedder.avgdl	ported	src/bm25/embedder.cr::Embedder#avgdl	Getter
+src/embedder.rs::method::EmbedderBuilder.with_avgdl	ported	src/bm25/embedder.cr::EmbedderBuilder.with_avgdl	Class method
+src/embedder.rs::method::EmbedderBuilder.with_fit_to_corpus	ported	src/bm25/embedder.cr::EmbedderBuilder.with_fit_to_corpus	Class method
+src/embedder.rs::method::EmbedderBuilder.with_tokenizer_and_fit_to_corpus	ported	src/bm25/embedder.cr::EmbedderBuilder.with_tokenizer_and_fit_to_corpus	Class method
+src/embedder.rs::method::TokenEmbedding.new	ported	src/bm25/embedder.cr::TokenEmbedding#initialize	Constructor
+src/embedder.rs::method::Embedding.any	ported	src/bm25/embedder.cr::Embedding.any	Class method
+src/embedder.rs::method::Embedding.indices	ported	src/bm25/embedder.cr::Embedding#indices	Returns Array(D)
+src/scorer.rs::struct::ScoredDocument	ported	src/bm25/scorer.cr::ScoredDocument(K)	Struct with id + score
+src/scorer.rs::struct::Scorer	ported	src/bm25/scorer.cr::Scorer(K,D)	Class with upsert/remove/score/matches
+src/scorer.rs::method::Scorer.new	ported	src/bm25/scorer.cr::Scorer#initialize	Constructor
+src/search.rs::struct::Document	ported	src/bm25/search.cr::Document(K)	Struct with id + contents
+src/search.rs::struct::SearchResult	ported	src/bm25/search.cr::SearchResult(K)	Struct with document + score
+src/search.rs::struct::SearchEngine	ported	src/bm25/search.cr::SearchEngine(K,D,T)	Class with upsert/remove/get/search
+src/search.rs::struct::SearchEngineBuilder	ported	src/bm25/search.cr::SearchEngineBuilder(K,D,T)	Builder with all options
+src/search.rs::method::Document.new	ported	src/bm25/search.cr::Document#initialize	Constructor
+src/search.rs::method::SearchEngine.upsert	ported	src/bm25/search.cr::SearchEngine#upsert	Method
+src/search.rs::method::SearchEngineBuilder.with_avgdl	ported	src/bm25/search.cr::SearchEngineBuilder.with_avgdl	Class method
+src/search.rs::method::SearchEngineBuilder.with_documents	ported	src/bm25/search.cr::SearchEngineBuilder.with_documents	Class method
+src/default_tokenizer.rs::enum::Language	ported	src/bm25/default_tokenizer.cr::Language	Enum with 16 languages
+src/default_tokenizer.rs::enum::LanguageMode	ported	src/bm25/default_tokenizer.cr::LanguageMode	Enum with Fixed(Language); no Detect
+src/default_tokenizer.rs::struct::DefaultTokenizer	ported	src/bm25/default_tokenizer.cr::DefaultTokenizer	Class with Components + Resources
+src/default_tokenizer.rs::struct::DefaultTokenizerBuilder	ported	src/bm25/default_tokenizer.cr::DefaultTokenizerBuilder	Builder with all options
+src/default_tokenizer.rs::method::DefaultTokenizer.new	ported	src/bm25/default_tokenizer.cr::DefaultTokenizer#initialize	Constructor
+src/default_tokenizer.rs::method::DefaultTokenizerBuilder.new	ported	src/bm25/default_tokenizer.cr::DefaultTokenizerBuilder#initialize	Constructor
