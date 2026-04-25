@@ -1,6 +1,7 @@
 /lib/
 /bin/
 /.shards/
+/bm25
 *.dwarf
 
 # Libraries don't need dependency lock
