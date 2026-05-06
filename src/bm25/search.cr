@@ -95,9 +95,14 @@ module Bm25
       new(embedder_builder: eb, documents: documents)
     end
 
-    def self.with_tokenizer_and_corpus(tokenizer : T, corpus : Array(String), token_embedder : TokenEmbedder(D)) : self
-      eb = EmbedderBuilder(D, T).with_tokenizer_and_fit_to_corpus(tokenizer, corpus, token_embedder)
-      new(embedder_builder: eb)
+    def self.with_tokenizer_and_corpus(tokenizer : T, corpus : Array(String), token_embedder : TokenEmbedder(D)) : SearchEngineBuilder(UInt32, D, T)
+      documents = Array(Document(UInt32)).new(corpus.size)
+      corpus.each_with_index do |contents, id|
+        documents << Document(UInt32).new(id.to_u32, contents)
+      end
+      contents = documents.map(&.contents)
+      eb = EmbedderBuilder(D, T).with_tokenizer_and_fit_to_corpus(tokenizer, contents, token_embedder)
+      SearchEngineBuilder(UInt32, D, T).new(embedder_builder: eb, documents: documents)
     end
 
     def self.with_documents(language_mode : LanguageMode, documents : Array(Document(K)), token_embedder : TokenEmbedder(D)) : self
@@ -106,9 +111,17 @@ module Bm25
       new(embedder_builder: eb, documents: documents)
     end
 
-    def self.with_corpus(language_mode : LanguageMode, corpus : Array(String), token_embedder : TokenEmbedder(D)) : self
-      eb = EmbedderBuilder(D, T).with_fit_to_corpus(language_mode, corpus, token_embedder)
-      new(embedder_builder: eb)
+    def self.with_documents(language : Language, documents : Array(Document(K)), token_embedder : TokenEmbedder(D)) : self
+      with_documents(LanguageMode.fixed(language), documents, token_embedder)
+    end
+
+    def self.with_corpus(language_mode : LanguageMode, corpus : Array(String), token_embedder : TokenEmbedder(D)) : SearchEngineBuilder(UInt32, D, T)
+      tokenizer = DefaultTokenizer.new(language_mode).as(T)
+      with_tokenizer_and_corpus(tokenizer, corpus, token_embedder)
+    end
+
+    def self.with_corpus(language : Language, corpus : Array(String), token_embedder : TokenEmbedder(D)) : SearchEngineBuilder(UInt32, D, T)
+      with_corpus(LanguageMode.fixed(language), corpus, token_embedder)
     end
 
     def k1(v : Float32) : self
@@ -139,6 +152,10 @@ module Bm25
     def language_mode(mode : LanguageMode) : self
       @embedder_builder.try(&.language_mode(mode))
       self
+    end
+
+    def language_mode(language : Language) : self
+      language_mode(LanguageMode.fixed(language))
     end
 
     def build : SearchEngine(K, D, T)

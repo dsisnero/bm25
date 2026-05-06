@@ -1,7 +1,7 @@
 # source_id	kind	status	crystal_refs	notes
-benches/search.rs::func::read_recipes	func	skipped	-	Benchmark code, not ported
-benches/search.rs::struct::BenchmarkRecipe	struct	skipped	-	Benchmark code, not ported
-benches/search.rs::struct::Recipe	struct	skipped	-	Benchmark code, not ported
+benches/search.rs::func::read_recipes	func	ported	benchmarks/search.cr	Benchmark helper port
+benches/search.rs::struct::BenchmarkRecipe	struct	ported	benchmarks/search.cr	Benchmark wrapper port
+benches/search.rs::struct::Recipe	struct	ported	benchmarks/search.cr	Benchmark data record port
 src/tokenizer.rs::trait::Tokenizer	trait	ported	src/bm25/tokenizer.cr	Full parity
 src/embedder.rs::struct::TokenEmbedding	struct	ported	src/bm25/embedder.cr	Full parity
 src/embedder.rs::struct::Embedding	struct	ported	src/bm25/embedder.cr	Full parity
@@ -9,7 +9,7 @@ src/embedder.rs::trait::TokenEmbedder	trait	ported	src/bm25/embedder.cr	Full par
 src/embedder.rs::type::DefaultTokenEmbedder	type	ported	src/bm25/embedder.cr	U32Embedder
 src/embedder.rs::type::DefaultEmbeddingSpace	type	ported	-	UInt32, implicit
 src/embedder.rs::type::DefaultTokenizer	type	ported	src/bm25/embedder.cr	Type alias
-src/embedder.rs::struct::NoDefaultTokenizer	struct	skipped	-	Crystal always has default tokenizer
+src/embedder.rs::struct::NoDefaultTokenizer	struct	ported	src/bm25/embedder.cr	Sentinel type; Crystal always has default tokenizer
 src/embedder.rs::struct::Embedder	struct	ported	src/bm25/embedder.cr	Full parity
 src/embedder.rs::struct::EmbedderBuilder	struct	ported	src/bm25/embedder.cr	Full parity
 src/embedder.rs::func::avgdl	func	ported	src/bm25/embedder.cr	Getter
@@ -66,7 +66,7 @@ src/search.rs::method::SearchEngine.upsert	method	ported	src/bm25/search.cr	Meth
 src/search.rs::method::SearchEngineBuilder.with_avgdl	method	ported	src/bm25/search.cr	Class method
 src/search.rs::method::SearchEngineBuilder.with_documents	method	ported	src/bm25/search.cr	Class method
 src/default_tokenizer.rs::enum::Language	enum	ported	src/bm25/default_tokenizer.cr	Full parity (16 languages)
-src/default_tokenizer.rs::enum::LanguageMode	enum	ported	src/bm25/default_tokenizer.cr	Fixed variant only; no Detect
+src/default_tokenizer.rs::enum::LanguageMode	enum	ported	src/bm25/default_tokenizer.cr	Struct wrapper with Fixed and Detect modes; Detect uses English/German stopword heuristic
 src/default_tokenizer.rs::struct::DefaultTokenizer	struct	ported	src/bm25/default_tokenizer.cr	Full parity
 src/default_tokenizer.rs::struct::DefaultTokenizerBuilder	struct	ported	src/bm25/default_tokenizer.cr	Full parity
 src/default_tokenizer.rs::func::build	func	ported	src/bm25/default_tokenizer.cr	Builder#build
@@ -78,5 +78,56 @@ src/default_tokenizer.rs::func::stemming	func	ported	src/bm25/default_tokenizer.
 src/default_tokenizer.rs::func::stopwords	func	ported	src/bm25/default_tokenizer.cr	Builder#stopwords
 src/default_tokenizer.rs::method::DefaultTokenizer.new	method	ported	src/bm25/default_tokenizer.cr	Constructor
 src/default_tokenizer.rs::method::DefaultTokenizerBuilder.new	method	ported	src/bm25/default_tokenizer.cr	Constructor
-src/test_data_loader.rs::func::read_recipes	func	skipped	-	Test helper, not ported
-src/test_data_loader.rs::struct::Recipe	struct	skipped	-	Test helper, not ported
+src/test_data_loader.rs::func::read_recipes	func	ported	spec/support/recipe_loader.cr	Spec helper port
+src/test_data_loader.rs::struct::Recipe	struct	ported	spec/support/recipe_loader.cr	Spec helper record
+src/embedder.rs::test::it_weights_unique_words_equally	test	ported	spec/bm25_spec.cr	Matching test
+src/embedder.rs::test::it_weights_repeated_words_unequally	test	ported	spec/bm25_spec.cr	Matching test
+src/embedder.rs::test::it_constrains_avgdl	test	ported	spec/bm25_spec.cr	Matching test
+src/embedder.rs::test::it_handles_empty_corpus	test	ported	spec/bm25_spec.cr	Matching test
+src/embedder.rs::test::it_handles_empty_input	test	ported	spec/bm25_spec.cr	Matching test
+src/embedder.rs::test::it_allows_customisation_of_embedder	test	ported	spec/bm25_spec.cr	Matching test
+src/embedder.rs::test::it_allows_customisation_of_tokenizer	test	ported	spec/bm25_spec.cr	Matching test
+src/embedder.rs::test::it_matches_snapshot_en	test	ported	spec/bm25_spec.cr	Dataset-based snapshot test
+src/embedder.rs::test::it_matches_snapshot_de	test	ported	spec/bm25_spec.cr	Dataset-based snapshot test
+src/scorer.rs::test::it_scores_mutually_exclusive_indices_as_zero	test	ported	spec/bm25_spec.cr	Matching test
+src/scorer.rs::test::it_scores_rare_indices_higher_than_common_ones	test	ported	spec/bm25_spec.cr	Matching test
+src/scorer.rs::test::it_scores_longer_embeddings_lower_than_shorter_ones	test	ported	spec/bm25_spec.cr	Matching test
+src/scorer.rs::test::it_scores_missing_document_as_none	test	ported	spec/bm25_spec.cr	Matching test
+src/scorer.rs::test::it_only_matches_embeddings_with_non_zero_score	test	ported	spec/bm25_spec.cr	Matching test
+src/scorer.rs::test::it_does_not_score_frequent_terms_negatively	test	ported	spec/bm25_spec.cr	Matching test
+src/scorer.rs::test::it_sorts_matches_by_score	test	ported	spec/bm25_spec.cr	Matching test
+src/search.rs::test::search_returns_relevant_documents	test	ported	spec/bm25_spec.cr	Matching test
+src/search.rs::test::search_does_not_return_unrelated_documents	test	ported	spec/bm25_spec.cr	Matching test
+src/search.rs::test::it_can_insert_a_document	test	ported	spec/bm25_spec.cr	Matching test
+src/search.rs::test::it_can_remove_a_document	test	ported	spec/bm25_spec.cr	Matching test
+src/search.rs::test::it_can_update_a_document	test	ported	spec/bm25_spec.cr	Matching test
+src/search.rs::test::handles_empty_input	test	ported	spec/bm25_spec.cr	Matching test
+src/search.rs::test::handles_empty_search	test	ported	spec/bm25_spec.cr	Matching test
+src/search.rs::test::it_returns_exact_matches_with_highest_score	test	ported	spec/bm25_spec.cr	Inline parity test
+src/search.rs::test::it_only_returns_results_containing_query	test	ported	spec/bm25_spec.cr	Dataset-based test
+src/search.rs::test::it_returns_results_sorted_by_score	test	ported	spec/bm25_spec.cr	Dataset-based test
+src/search.rs::test::it_ranks_shorter_documents_higher	test	ported	spec/bm25_spec.cr	Matching test
+src/search.rs::test::it_matches_common_unicode_equivalents	test	ported	spec/bm25_spec.cr	Matching test
+src/search.rs::test::it_can_search_for_emoji	test	ported	spec/bm25_spec.cr	Matching test
+src/search.rs::test::it_matches_snapshot_en	test	ported	spec/bm25_spec.cr	Dataset-based snapshot test
+src/search.rs::test::it_matches_snapshot_de	test	ported	spec/bm25_spec.cr	Dataset-based snapshot test
+src/default_tokenizer.rs::test::it_can_tokenize_english	test	ported	spec/default_tokenizer_spec.cr	Matching test
+src/default_tokenizer.rs::test::it_converts_to_lowercase	test	ported	spec/default_tokenizer_spec.cr	Matching test
+src/default_tokenizer.rs::test::it_removes_whitespace	test	ported	spec/default_tokenizer_spec.cr	Matching test
+src/default_tokenizer.rs::test::it_removes_stopwords	test	ported	spec/default_tokenizer_spec.cr	Matching test
+src/default_tokenizer.rs::test::it_keeps_numbers	test	ported	spec/default_tokenizer_spec.cr	Matching test
+src/default_tokenizer.rs::test::it_keeps_contracted_words	test	ported	spec/default_tokenizer_spec.cr	Matching test
+src/default_tokenizer.rs::test::it_removes_punctuation	test	ported	spec/default_tokenizer_spec.cr	Matching test
+src/default_tokenizer.rs::test::it_stems_words	test	ported	spec/default_tokenizer_spec.cr	Matching test
+src/default_tokenizer.rs::test::it_tokenizes_emojis_as_text	test	ported	spec/default_tokenizer_spec.cr	Matching test
+src/default_tokenizer.rs::test::it_converts_unicode_to_ascii	test	ported	spec/default_tokenizer_spec.cr	Matching test
+src/default_tokenizer.rs::test::it_does_not_convert_unicode_when_normalization_disabled	test	ported	spec/default_tokenizer_spec.cr	Matching test
+src/default_tokenizer.rs::test::it_does_not_remove_stopwords_when_stopwords_disabled	test	ported	spec/default_tokenizer_spec.cr	Matching test
+src/default_tokenizer.rs::test::it_does_not_stem_when_stemming_disabled	test	ported	spec/default_tokenizer_spec.cr	Matching test
+src/default_tokenizer.rs::test::it_handles_empty_input	test	ported	spec/default_tokenizer_spec.cr	Matching test including Detect variant
+src/default_tokenizer.rs::test::it_detects_english	test	ported	spec/default_tokenizer_spec.cr	Dataset-based Detect parity test
+src/default_tokenizer.rs::test::it_detects_german	test	ported	spec/default_tokenizer_spec.cr	Dataset-based Detect parity test
+src/default_tokenizer.rs::test::it_matches_snapshot_en	test	ported	spec/default_tokenizer_spec.cr	Dataset-based snapshot test
+src/default_tokenizer.rs::test::it_matches_snapshot_de	test	ported	spec/default_tokenizer_spec.cr	Dataset-based snapshot test
+src/test_data_loader.rs::test::it_should_panic_if_the_file_does_not_exist	test	ported	spec/recipe_loader_spec.cr	Matching test
+src/test_data_loader.rs::test::it_should_read_recipes_from_a_csv_file	test	ported	spec/recipe_loader_spec.cr	Matching test

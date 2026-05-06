@@ -70,56 +70,66 @@ module Bm25
     end
   end
 
-  private K64 = 0xf1357aea2e62a9c5_u64
+  class NoDefaultTokenizer < Tokenizer
+    def tokenize(input_text : String) : Array(String)
+      raise "NoDefaultTokenizer is a sentinel; use DefaultTokenizer or provide a custom tokenizer"
+    end
+  end
+
+  private K64       = 0x517cc1b727220a95_u64
+  private FX_ROTATE =                      5
 
   def self.hash32(token : String) : UInt32
-    hash_bytes(token).to_u32!
+    hash = fx_write32(0_u32, token.to_slice)
+    fx_hash_word32(hash, 0xff_u32)
   end
 
   def self.hash64(token : String) : UInt64
-    hash_bytes(token)
+    hash = fx_write64(0_u64, token.to_slice)
+    fx_hash_word64(hash, 0xff_u64)
   end
 
-  private def self.hash_bytes(bytes : String) : UInt64
-    data = bytes.to_slice
-    len = data.size
+  private def self.fx_hash_word32(hash : UInt32, word : UInt32) : UInt32
+    (hash.rotate_left(FX_ROTATE) ^ word) &* K32
+  end
 
-    s0 = 0x243f6a8885a308d3_u64
-    s1 = 0x13198a2e03707344_u64
+  private def self.fx_hash_word64(hash : UInt64, word : UInt64) : UInt64
+    (hash.rotate_left(FX_ROTATE) ^ word) &* K64
+  end
 
-    if len <= 16
-      if len >= 8
-        s0 ^= read_u64_le(data, 0)
-        s1 ^= read_u64_le(data, len - 8)
-      elsif len >= 4
-        s0 ^= read_u32_le(data, 0).to_u64
-        s1 ^= read_u32_le(data, len - 4).to_u64
-      elsif len > 0
-        lo = data[0].to_u64
-        mid = data[len // 2].to_u64
-        hi = data[len - 1].to_u64
-        s0 ^= lo
-        s1 ^= (hi << 8) | mid
-      end
-    else
-      bulk_end = len - 1
-      pos = 0
-      while pos + 16 <= bulk_end
-        x = read_u64_le(data, pos)
-        y = read_u64_le(data, pos + 8)
-        t = multiply_mix(s0 ^ x, 0xa4093822299f31d0_u64 ^ y)
-        s0 = s1
-        s1 = t
-        pos += 16
-      end
-
-      suffix_start = len - 16
-      s0 ^= read_u64_le(data, suffix_start)
-      s1 ^= read_u64_le(data, suffix_start + 8)
+  private def self.fx_write32(hash : UInt32, data : Slice(UInt8)) : UInt32
+    current = hash
+    pos = 0
+    while pos + 4 <= data.size
+      current = fx_hash_word32(current, read_u32_le(data, pos))
+      pos += 4
     end
-
-    multiply_mix(s0, s1) ^ len.to_u64
+    while pos < data.size
+      current = fx_hash_word32(current, data[pos].to_u32)
+      pos += 1
+    end
+    current
   end
+
+  private def self.fx_write64(hash : UInt64, data : Slice(UInt8)) : UInt64
+    current = hash
+    pos = 0
+    while pos + 8 <= data.size
+      current = fx_hash_word64(current, read_u64_le(data, pos))
+      pos += 8
+    end
+    if pos + 4 <= data.size
+      current = fx_hash_word64(current, read_u32_le(data, pos).to_u64)
+      pos += 4
+    end
+    while pos < data.size
+      current = fx_hash_word64(current, data[pos].to_u64)
+      pos += 1
+    end
+    current
+  end
+
+  private K32 = (K64 & 0xFFFF_FFFF_u64).to_u32
 
   private def self.read_u64_le(data : Slice(UInt8), offset : Int) : UInt64
     data[offset].to_u64 |
@@ -137,18 +147,6 @@ module Bm25
       (data[offset + 1].to_u32 << 8) |
       (data[offset + 2].to_u32 << 16) |
       (data[offset + 3].to_u32 << 24)
-  end
-
-  private def self.multiply_mix(x : UInt64, y : UInt64) : UInt64
-    lx = x & 0xFFFF_FFFF
-    ly = y & 0xFFFF_FFFF
-    hx = (x >> 32) & 0xFFFF_FFFF
-    hy = (y >> 32) & 0xFFFF_FFFF
-
-    afull = lx &* hy
-    bfull = hx &* ly
-
-    afull ^ bfull.rotate_right(32)
   end
 
   class Embedder(D, T)
@@ -218,9 +216,17 @@ module Bm25
       with_tokenizer_and_fit_to_corpus(tokenizer, corpus, token_embedder)
     end
 
+    def self.with_fit_to_corpus(language : Language, corpus : Array(String), token_embedder : TokenEmbedder(D)) : self
+      with_fit_to_corpus(LanguageMode.fixed(language), corpus, token_embedder)
+    end
+
     def language_mode(language_mode : LanguageMode) : self
       @tokenizer = DefaultTokenizer.new(language_mode).as(T)
       self
+    end
+
+    def language_mode(language : Language) : self
+      language_mode(LanguageMode.fixed(language))
     end
 
     def k1(k1 : Float32) : self

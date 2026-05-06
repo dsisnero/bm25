@@ -1,33 +1,82 @@
 # source_api_id	status	crystal_refs	notes
-src/tokenizer.rs::trait::Tokenizer	ported	src/bm25/tokenizer.cr	Abstract class with tokenize method
-src/embedder.rs::struct::TokenEmbedding	ported	src/bm25/embedder.cr::TokenEmbedding(D)	Struct with index + value
-src/embedder.rs::struct::Embedding	ported	src/bm25/embedder.cr::Embedding(D)	Struct wrapping Array(TokenEmbedding(D))
-src/embedder.rs::trait::TokenEmbedder	ported	src/bm25/embedder.cr::TokenEmbedder(D)	Module with abstract embed method
-src/embedder.rs::type::DefaultTokenEmbedder	ported	src/bm25/embedder.cr::U32Embedder	UInt32 embedder with fxhash
-src/embedder.rs::type::DefaultEmbeddingSpace	ported	-	UInt32, implicit
-src/embedder.rs::struct::Embedder	ported	src/bm25/embedder.cr::Embedder(D,T)	Class with embed, k1, b, avgdl
-src/embedder.rs::struct::EmbedderBuilder	ported	src/bm25/embedder.cr::EmbedderBuilder(D,T)	Builder with all options
-src/embedder.rs::method::Embedder.avgdl	ported	src/bm25/embedder.cr::Embedder#avgdl	Getter
-src/embedder.rs::method::EmbedderBuilder.with_avgdl	ported	src/bm25/embedder.cr::EmbedderBuilder.with_avgdl	Class method
-src/embedder.rs::method::EmbedderBuilder.with_fit_to_corpus	ported	src/bm25/embedder.cr::EmbedderBuilder.with_fit_to_corpus	Class method
-src/embedder.rs::method::EmbedderBuilder.with_tokenizer_and_fit_to_corpus	ported	src/bm25/embedder.cr::EmbedderBuilder.with_tokenizer_and_fit_to_corpus	Class method
-src/embedder.rs::method::TokenEmbedding.new	ported	src/bm25/embedder.cr::TokenEmbedding#initialize	Constructor
-src/embedder.rs::method::Embedding.any	ported	src/bm25/embedder.cr::Embedding.any	Class method
-src/embedder.rs::method::Embedding.indices	ported	src/bm25/embedder.cr::Embedding#indices	Returns Array(D)
-src/scorer.rs::struct::ScoredDocument	ported	src/bm25/scorer.cr::ScoredDocument(K)	Struct with id + score
-src/scorer.rs::struct::Scorer	ported	src/bm25/scorer.cr::Scorer(K,D)	Class with upsert/remove/score/matches
-src/scorer.rs::method::Scorer.new	ported	src/bm25/scorer.cr::Scorer#initialize	Constructor
-src/search.rs::struct::Document	ported	src/bm25/search.cr::Document(K)	Struct with id + contents
-src/search.rs::struct::SearchResult	ported	src/bm25/search.cr::SearchResult(K)	Struct with document + score
-src/search.rs::struct::SearchEngine	ported	src/bm25/search.cr::SearchEngine(K,D,T)	Class with upsert/remove/get/search
-src/search.rs::struct::SearchEngineBuilder	ported	src/bm25/search.cr::SearchEngineBuilder(K,D,T)	Builder with all options
-src/search.rs::method::Document.new	ported	src/bm25/search.cr::Document#initialize	Constructor
-src/search.rs::method::SearchEngine.upsert	ported	src/bm25/search.cr::SearchEngine#upsert	Method
-src/search.rs::method::SearchEngineBuilder.with_avgdl	ported	src/bm25/search.cr::SearchEngineBuilder.with_avgdl	Class method
-src/search.rs::method::SearchEngineBuilder.with_documents	ported	src/bm25/search.cr::SearchEngineBuilder.with_documents	Class method
-src/default_tokenizer.rs::enum::Language	ported	src/bm25/default_tokenizer.cr::Language	Enum with 16 languages
-src/default_tokenizer.rs::enum::LanguageMode	ported	src/bm25/default_tokenizer.cr::LanguageMode	Enum with Fixed(Language); no Detect
-src/default_tokenizer.rs::struct::DefaultTokenizer	ported	src/bm25/default_tokenizer.cr::DefaultTokenizer	Class with Components + Resources
-src/default_tokenizer.rs::struct::DefaultTokenizerBuilder	ported	src/bm25/default_tokenizer.cr::DefaultTokenizerBuilder	Builder with all options
-src/default_tokenizer.rs::method::DefaultTokenizer.new	ported	src/bm25/default_tokenizer.cr::DefaultTokenizer#initialize	Constructor
-src/default_tokenizer.rs::method::DefaultTokenizerBuilder.new	ported	src/bm25/default_tokenizer.cr::DefaultTokenizerBuilder#initialize	Constructor
+benches/search.rs::func::read_recipes	mapped	benchmarks/search.cr	Benchmark helper port
+benches/search.rs::struct::BenchmarkRecipe	mapped	benchmarks/search.cr	Benchmark wrapper port
+benches/search.rs::struct::Recipe	mapped	benchmarks/search.cr	Benchmark data record port
+src/tokenizer.rs::trait::Tokenizer	mapped	src/bm25/tokenizer.cr	Full parity
+src/embedder.rs::struct::TokenEmbedding	mapped	src/bm25/embedder.cr	Full parity
+src/embedder.rs::struct::Embedding	mapped	src/bm25/embedder.cr	Full parity
+src/embedder.rs::trait::TokenEmbedder	mapped	src/bm25/embedder.cr	Full parity
+src/embedder.rs::type::DefaultTokenEmbedder	mapped	src/bm25/embedder.cr	U32Embedder
+src/embedder.rs::type::DefaultEmbeddingSpace	mapped	-	UInt32, implicit
+src/embedder.rs::type::DefaultTokenizer	mapped	src/bm25/embedder.cr	Type alias
+src/embedder.rs::struct::NoDefaultTokenizer	mapped	src/bm25/embedder.cr	Sentinel type; Crystal always has default tokenizer
+src/embedder.rs::struct::Embedder	mapped	src/bm25/embedder.cr	Full parity
+src/embedder.rs::struct::EmbedderBuilder	mapped	src/bm25/embedder.cr	Full parity
+src/embedder.rs::func::avgdl	mapped	src/bm25/embedder.cr	Getter
+src/embedder.rs::func::b	mapped	src/bm25/embedder.cr	Getter
+src/embedder.rs::func::build	mapped	src/bm25/embedder.cr	Builder build
+src/embedder.rs::func::embed	mapped	src/bm25/embedder.cr	Embedder#embed
+src/embedder.rs::func::indices	mapped	src/bm25/embedder.cr	Embedding#indices
+src/embedder.rs::func::k1	mapped	src/bm25/embedder.cr	Getter
+src/embedder.rs::func::language_mode	mapped	src/bm25/embedder.cr	Builder#language_mode
+src/embedder.rs::func::new	mapped	src/bm25/embedder.cr	Embedder#initialize
+src/embedder.rs::func::tokenizer	mapped	src/bm25/embedder.cr	Builder#tokenizer
+src/embedder.rs::func::values	mapped	src/bm25/embedder.cr	Embedding#values
+src/embedder.rs::func::with_avgdl	mapped	src/bm25/embedder.cr	Builder.with_avgdl
+src/embedder.rs::func::with_fit_to_corpus	mapped	src/bm25/embedder.cr	Builder.with_fit_to_corpus
+src/embedder.rs::func::with_tokenizer_and_fit_to_corpus	mapped	src/bm25/embedder.cr	Builder.with_tokenizer_and_fit_to_corpus
+src/embedder.rs::method::Embedder.avgdl	mapped	src/bm25/embedder.cr	Getter
+src/embedder.rs::method::EmbedderBuilder.with_avgdl	mapped	src/bm25/embedder.cr	Class method
+src/embedder.rs::method::EmbedderBuilder.with_fit_to_corpus	mapped	src/bm25/embedder.cr	Class method
+src/embedder.rs::method::Embedding.any	mapped	src/bm25/embedder.cr	Class method
+src/embedder.rs::method::Embedding.indices	mapped	src/bm25/embedder.cr	Instance method
+src/embedder.rs::method::TokenEmbedding.new	mapped	src/bm25/embedder.cr	Constructor
+src/embedder.rs::func::any	mapped	src/bm25/embedder.cr	Embedding.any
+src/scorer.rs::struct::ScoredDocument	mapped	src/bm25/scorer.cr	Full parity
+src/scorer.rs::struct::Scorer	mapped	src/bm25/scorer.cr	Full parity
+src/scorer.rs::func::matches	mapped	src/bm25/scorer.cr	Full parity
+src/scorer.rs::func::new	mapped	src/bm25/scorer.cr	Full parity
+src/scorer.rs::func::remove	mapped	src/bm25/scorer.cr	Full parity
+src/scorer.rs::func::score	mapped	src/bm25/scorer.cr	Full parity
+src/scorer.rs::func::upsert	mapped	src/bm25/scorer.cr	Full parity
+src/scorer.rs::method::Scorer.new	mapped	src/bm25/scorer.cr	Constructor
+src/search.rs::struct::Document	mapped	src/bm25/search.cr	Full parity
+src/search.rs::struct::SearchResult	mapped	src/bm25/search.cr	Full parity
+src/search.rs::struct::SearchEngine	mapped	src/bm25/search.cr	Full parity
+src/search.rs::struct::SearchEngineBuilder	mapped	src/bm25/search.cr	Full parity
+src/search.rs::func::avgdl	mapped	src/bm25/search.cr	Getter
+src/search.rs::func::b	mapped	src/bm25/search.cr	Getter
+src/search.rs::func::build	mapped	src/bm25/search.cr	Builder#build
+src/search.rs::func::get	mapped	src/bm25/search.cr	SearchEngine#get
+src/search.rs::func::iter	mapped	src/bm25/search.cr	SearchEngine#each
+src/search.rs::func::k1	mapped	src/bm25/search.cr	Getter
+src/search.rs::func::language_mode	mapped	src/bm25/search.cr	Builder#language_mode
+src/search.rs::func::new	mapped	src/bm25/search.cr	SearchEngine#initialize
+src/search.rs::func::remove	mapped	src/bm25/search.cr	SearchEngine#remove
+src/search.rs::func::search	mapped	src/bm25/search.cr	SearchEngine#search
+src/search.rs::func::tokenizer	mapped	src/bm25/search.cr	Builder#tokenizer
+src/search.rs::func::upsert	mapped	src/bm25/search.cr	SearchEngine#upsert
+src/search.rs::func::with_avgdl	mapped	src/bm25/search.cr	Builder.with_avgdl
+src/search.rs::func::with_corpus	mapped	src/bm25/search.cr	Builder.with_corpus
+src/search.rs::func::with_documents	mapped	src/bm25/search.cr	Builder.with_documents
+src/search.rs::func::with_tokenizer_and_corpus	mapped	src/bm25/search.cr	Builder.with_tokenizer_and_corpus
+src/search.rs::func::with_tokenizer_and_documents	mapped	src/bm25/search.cr	Builder.with_tokenizer_and_documents
+src/search.rs::method::Document.new	mapped	src/bm25/search.cr	Constructor
+src/search.rs::method::SearchEngine.upsert	mapped	src/bm25/search.cr	Method
+src/search.rs::method::SearchEngineBuilder.with_avgdl	mapped	src/bm25/search.cr	Class method
+src/search.rs::method::SearchEngineBuilder.with_documents	mapped	src/bm25/search.cr	Class method
+src/default_tokenizer.rs::enum::Language	mapped	src/bm25/default_tokenizer.cr	Full parity (16 languages)
+src/default_tokenizer.rs::enum::LanguageMode	mapped	src/bm25/default_tokenizer.cr	Struct wrapper with Fixed and Detect modes; Detect uses English/German stopword heuristic
+src/default_tokenizer.rs::struct::DefaultTokenizer	mapped	src/bm25/default_tokenizer.cr	Full parity
+src/default_tokenizer.rs::struct::DefaultTokenizerBuilder	mapped	src/bm25/default_tokenizer.cr	Full parity
+src/default_tokenizer.rs::func::build	mapped	src/bm25/default_tokenizer.cr	Builder#build
+src/default_tokenizer.rs::func::builder	mapped	src/bm25/default_tokenizer.cr	DefaultTokenizer.builder
+src/default_tokenizer.rs::func::language_mode	mapped	src/bm25/default_tokenizer.cr	Builder#language_mode
+src/default_tokenizer.rs::func::new	mapped	src/bm25/default_tokenizer.cr	DefaultTokenizer.new
+src/default_tokenizer.rs::func::normalization	mapped	src/bm25/default_tokenizer.cr	Builder#normalization
+src/default_tokenizer.rs::func::stemming	mapped	src/bm25/default_tokenizer.cr	Builder#stemming
+src/default_tokenizer.rs::func::stopwords	mapped	src/bm25/default_tokenizer.cr	Builder#stopwords
+src/default_tokenizer.rs::method::DefaultTokenizer.new	mapped	src/bm25/default_tokenizer.cr	Constructor
+src/default_tokenizer.rs::method::DefaultTokenizerBuilder.new	mapped	src/bm25/default_tokenizer.cr	Constructor
+src/test_data_loader.rs::func::read_recipes	mapped	spec/support/recipe_loader.cr	Spec helper port
+src/test_data_loader.rs::struct::Recipe	mapped	spec/support/recipe_loader.cr	Spec helper record
