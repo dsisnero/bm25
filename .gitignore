@@ -16,3 +16,23 @@
 
 # Temporary working artifacts
 temp/
+
+# Removable-drive and cross-platform filesystem artifacts
+.DS_Store
+._*
+.AppleDouble/
+.LSOverride
+Icon?
+.Spotlight-V100/
+.Trashes/
+.fseventsd/
+.TemporaryItems/
+Temporary Items/
+.apdisk
+$RECYCLE.BIN/
+FOUND.000/
+System Volume Information/
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+desktop.ini
